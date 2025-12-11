@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MBR Gym Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* Glassmorphism for chatbot */
+    .glass {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    /* Chatbot transition */
+    #chatWindow {
+      transition: 0.35s ease;
+    }
+
+    /* Smooth fade + slide animation */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0px); }
+    }
+    .animate-box {
+      animation: fadeUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+
+    /* Smooth neon hover */
+    .smooth-hover {
+      transition: all 0.4s ease;
+    }
+    .smooth-hover:hover {
+      scale: 1.05;
+      box-shadow: 0 0 30px #00eaff65;
+    }
+
+    /* Input adjustments */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { appearance: none; -moz-appearance: textfield; }
+
+    /* Animation for specialist text */
+    .specialist-text {
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+    .group:hover .specialist-text {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Contact + Map */
+     .fade-in {
+      animation: fadeIn 0.6s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-black text-white">
+
+  <!-- ========================= -->
+  <!-- NAVBAR -->
+  <!-- ========================= -->
+  <nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="#home" class="flex items-center gap-3">
+        <div class="flex items-center space-x-3">
+          <img src="https://i.ibb.co/fVQ6DhmF/Screenshot-2025-12-01-204543.png" alt="Aditi Sports Logo" class="w-12 h-12 rounded-full object-contain">
+        </div>
+        <!-- <div class="hidden sm:block">
+          <div class="text-lg font-semibold">MBR</div>
+          <div class="text-xs text-gray-500">LIFT HEAVY, LIVE LIGHT</div>
+        </div> -->
+      </a>
+      <div class="hidden md:flex items-center gap-10">
+        <a href="#" class="hover:text-red-500 transition">Home</a>
+        <a href="#" class="hover:text-red-500 transition">Programs</a>
+        <a href="#" class="hover:text-red-500 transition">Trainers</a>
+        <a href="#" class="hover:text-red-500 transition">Contact</a>
+      </div>
+      <button class="hidden md:block px-6 py-2 bg-blue-600 rounded-xl join-now-btn">Join Now</button>
+
+      <div class="md:hidden">
+        <svg class="w-10 h-10" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================= -->
+  <!-- HERO SECTION -->
+  <!-- ========================= -->
+  <section class="relative w-full h-screen overflow-hidden">
+    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover">
+      <source src="https://videos.pexels.com/video-files/5319099/5319099-hd_1920_1080_25fps.mp4" type="video/mp4">
+    </video>
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative z-10 h-full flex flex-col justify-center items-start px-10 max-w-4xl" onmousemove="this.style.transform=`translateY(${event.clientY/200}px)`">
+      <h1 class="text-6xl md:text-7xl font-extrabold">FORGE YOUR LEGACY</h1>
+      <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-xl">Pain Today, Power Tomorrow. Level up your strength, speed, and transformation journey.</p>
+      <div class="mt-10 flex items-center gap-6">
+        <button class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl text-xl join-now-btn">Join Now</button>
+
+        <button onclick="openVideo()" class="px-8 py-3 flex items-center gap-2 text-white text-xl bg-white/10 border border-white/30 rounded-xl backdrop-blur hover:bg-white/30 transition">▶ Watch Video</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- YOUTUBE MODAL -->
+  <!-- ========================= -->
+  <div id="videoModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur flex items-center justify-center z-50">
+    <div class="bg-black rounded-xl overflow-hidden max-w-3xl w-[90%] shadow-xl relative">
+      <button onclick="closeVideo()" class="absolute top-2 right-3 text-white text-3xl">&times;</button>
+      <iframe id="ytVideo" class="w-full h-80" src="" title="YouTube video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+  <!-- ========================= -->
+  <!-- WHY CHOOSE US -->
+  <!-- ========================= -->
+  <section class="max-w-6xl mx-auto py-12 px-6">
+    <h2 class="text-4xl md:text-5xl font-extrabold mb-10 text-center text-cyan-300">Why Choose Us</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <div class="flex flex-col gap-6">
+        <div class="rounded-2xl overflow-hidden border border-white/10 animate-box" style="animation-delay:0.1s">
+          <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800" class="w-full h-[300px] object-cover" alt="Trainer"/>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 smooth-hover animate-box cursor-pointer" style="animation-delay:0.2s">
+          <h3 class="text-2xl font-bold md:text-4xl">Top Trainers</h3>
+          <p class="md:text-xl">Certified and professionals Trainers</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-6">
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 smooth-hover animate-box cursor-pointer" style="animation-delay:0.3s">
+          <i class="fa-regular fa-clock text-pink-300 text-[35px]"></i>
+          <h3 class="text-2xl font-semibold mt-4">Open 24/7</h3>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 smooth-hover animate-box cursor-pointer" style="animation-delay:0.4s">
+          <i class="fa-solid fa-dumbbell text-green-500 text-[35px]"></i>
+          <h3 class="text-xl font-semibold mt-4">Modern Equipment</h3>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 smooth-hover animate-box cursor-pointer" style="animation-delay:0.5s">
+          <i class="fa-solid fa-wifi text-blue-400 text-[35px]"></i>
+          <h3 class="text-xl font-semibold mt-4">Free Wi-Fi & Steam</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- BMI & CALORIE CALCULATOR -->
+  <!-- ========================= -->
+  <section class="min-h-screen flex items-center justify-center p-4">
+    <div class="container max-w-4xl mx-auto">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">BMI & Calorie Calculator</h1>
+        <p class="text-gray-300 text-sm md:text-base">Enter your details to get BMI and daily calories instantly</p>
+      </div>
+
+      <div class="bg-gray-900 rounded-2xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
+        <div class="lg:w-1/2 p-4 md:p-6 space-y-4">
+          <input type="number" id="height" placeholder="Height (cm)" class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+          <input type="number" id="weight" placeholder="Weight (kg)" class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+          <input type="number" id="age" placeholder="Age" class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+          <select id="activity" class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="" disabled selected>Activity Level</option>
+            <option value="1.2">Sedentary</option>
+            <option value="1.375">Light</option>
+            <option value="1.55">Moderate</option>
+            <option value="1.725">Active</option>
+            <option value="1.9">Very Active</option>
+          </select>
+          <select id="goal" class="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="" disabled selected>Goal</option>
+            <option value="lose">Lose Weight</option>
+            <option value="maintain">Maintain</option>
+            <option value="bulk">Bulk</option>
+          </select>
+          <button id="calculateBtn" class="bg-gradient-to-r from-purple-600 to-violet-500 w-full py-3 rounded-lg text-white font-bold hover:shadow-lg transition-all">Calculate</button>
+        </div>
+        <div class="lg:w-1/2 p-4 md:p-6 bg-gray-800 space-y-4 text-white"><br>
+          <div id="bmiResult" class="bg-gray-900 rounded-lg p-4 text-center">
+            <h3 class="font-bold text-lg">BMI: <span id="bmiValue">-</span></h3>
+            <p>Category: <span id="bmiCategory" class="font-semibold text-green-400">-</span></p>
+          </div> <br>
+          <div id="calorieResult" class="bg-gray-900 rounded-lg p-4 text-center">
+            <h3 class="font-bold text-lg">Daily Calorie Needs</h3>
+            <p id="goalStatement" class="text-blue-400 font-semibold">You need _____ calories</p>
+          </div> <br><br>
+          <div id="ctaSection">
+            <button id="dietBtn" class="bg-gradient-to-r from-orange-500 to-orange-600 w-full py-3 rounded-lg font-bold hover:shadow-lg transition-all animate-pulse">Get Your Diet Plan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- Trainer -->
+  <!-- ========================= -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-4xl font-bold mb-3 text-center font-serif text-blue-400">Meet Our Trainers</h2>
+      <p class="text-white mb-12 text-center font-serif">Professional and certified trainers to help you transform your body.</p>
+  
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+  
+        <!-- Trainer 1 -->
+        <div class="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer">
+          <img src="https://img.freepik.com/free-photo/medical-assistant-preparing-physiotherapy-exercises_23-2149071431.jpg?semt=ais_hybrid&w=740&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          
+          <!-- Bottom Info -->
+          <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-3">
+            <h3 class="text-lg font-semibold">Aarti Kumari</h3>
+            <p class="text-sm text-gray-300">Weight Loss & Transformation Coach</p>
+          </div>
+  
+          <!-- Hover Overlay -->
+          <div class="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-center">
+            
+            <!-- Specialist Text -->
+            <p class="specialist-text text-white text-sm md:text-base font-medium bg-black/50 px-4 py-1 rounded">
+              Specialist: Weight Loss, Fat Burning, Cardio
+            </p>
+  
+            <!-- Social Icons -->
+           <div class="flex gap-4">
+              <!-- Instagram -->
+              <a href="https://www.instagram.com/instagram/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.9a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z"/>
+                </svg>
+              </a>
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/facebook" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5a3.5 3.5 0 013.7-3.9c1 0 2 .1 2 .1v2.3h-1.1c-1.1 0-1.4.7-1.4 1.3V12H19l-.5 3h-3v7A10 10 0 0022 12z"/>
+                </svg>
+              </a>
+              <!-- Twitter -->
+              <a href="https://twitter.com/Twitter" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 5.8c-.8.4-1.6.6-2.4.7a4.2 4.2 0 001.8-2.3c-.8.5-1.7.8-2.6 1A4.1 4.1 0 0015.5 4c-2.3 0-4.1 2-3.6 4.3A11.6 11.6 0 013 5.1a4.1 4.1 0 001.3 5.5c-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.8 2.1 3 4 3A8.2 8.2 0 012 19.5 11.6 11.6 0 008.3 21c7.6 0 11.9-6.4 11.6-12.1.8-.6 1.5-1.3 2-2.1z"/>
+                </svg>
+              </a>
+            </div>
+  
+          </div>
+        </div>
+  
+        <!-- Trainer 2 -->
+        <div class="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer">
+          <img src="https://img.freepik.com/free-photo/young-adult-doing-indoor-sport-gym_23-2149205542.jpg?semt=ais_hybrid&w=740&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          
+          <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-3">
+            <h3 class="text-lg font-semibold">Aman Singh</h3>
+            <p class="text-sm text-gray-300">Strength & Conditioning Coach</p>
+          </div>
+  
+          <div class="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-center">
+            <p class="specialist-text text-white text-sm md:text-base font-medium bg-black/50 px-4 py-1 rounded">
+              Specialist: Muscle Gain, Leg Day, Strength Training
+            </p>
+            <div class="flex gap-4">
+              <!-- Instagram -->
+              <a href="https://www.instagram.com/instagram/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.9a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z"/>
+                </svg>
+              </a>
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/facebook" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5a3.5 3.5 0 013.7-3.9c1 0 2 .1 2 .1v2.3h-1.1c-1.1 0-1.4.7-1.4 1.3V12H19l-.5 3h-3v7A10 10 0 0022 12z"/>
+                </svg>
+              </a>
+              <!-- Twitter -->
+              <a href="https://twitter.com/Twitter" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 5.8c-.8.4-1.6.6-2.4.7a4.2 4.2 0 001.8-2.3c-.8.5-1.7.8-2.6 1A4.1 4.1 0 0015.5 4c-2.3 0-4.1 2-3.6 4.3A11.6 11.6 0 013 5.1a4.1 4.1 0 001.3 5.5c-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.8 2.1 3 4 3A8.2 8.2 0 012 19.5 11.6 11.6 0 008.3 21c7.6 0 11.9-6.4 11.6-12.1.8-.6 1.5-1.3 2-2.1z"/>
+                </svg>
+              </a>
+            </div>
+  
+          </div>
+        </div>
+  
+        <!-- Trainer 3 -->
+        <div class="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer">
+          <img src="https://images.ctfassets.net/qw8ps43tg2ux/1LPfI8kPATAzojZMBalhli/7dbdddba786444110a762b75977a8fd8/how-it-works-issa-certified-personal-trainer.webp?fm=webp&w=1440&q=75" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          
+          <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-3">
+            <h3 class="text-lg font-semibold">Ajay Deor</h3>
+            <p class="text-sm text-gray-300">Muscle Building & Body Toning Trainer</p>
+          </div>
+  
+          <div class="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 text-center">
+            <p class="specialist-text text-white text-sm md:text-base font-medium bg-black/50 px-4 py-1 rounded">
+              Specialist: Back, Core, Muscle Building
+            </p>
+            <div class="flex gap-4">
+              <!-- Instagram -->
+              <a href="https://www.instagram.com/instagram/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.9a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z"/>
+                </svg>
+              </a>
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/facebook" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 12a10 10 0 10-11.5 9.9v-7H8v-3h2.5V9.5a3.5 3.5 0 013.7-3.9c1 0 2 .1 2 .1v2.3h-1.1c-1.1 0-1.4.7-1.4 1.3V12H19l-.5 3h-3v7A10 10 0 0022 12z"/>
+                </svg>
+              </a>
+              <!-- Twitter -->
+              <a href="https://twitter.com/Twitter" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 5.8c-.8.4-1.6.6-2.4.7a4.2 4.2 0 001.8-2.3c-.8.5-1.7.8-2.6 1A4.1 4.1 0 0015.5 4c-2.3 0-4.1 2-3.6 4.3A11.6 11.6 0 013 5.1a4.1 4.1 0 001.3 5.5c-.7 0-1.3-.2-1.9-.5 0 2 1.4 3.8 3.4 4.2-.6.2-1.2.2-1.8.1.5 1.8 2.1 3 4 3A8.2 8.2 0 012 19.5 11.6 11.6 0 008.3 21c7.6 0 11.9-6.4 11.6-12.1.8-.6 1.5-1.3 2-2.1z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ========================= -->
+  <!-- Transformation -->
+  <!-- ========================= -->
+   <section class="max-w-6xl mx-auto px-6 bg-black text-white py-12">
+
+    <h2 class="text-4xl font-bold text-blue-500 mb-8 text-center">
+      Amazing Transformations
+    </h2>
+
+    <!-- Transformation Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+      <!-- Card 1 -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <img src="https://i.ibb.co/svQG4L7T/picc7.jpg" class="w-full h-81 object-cover">
+        <div class="p-5">
+          <h3 class="text-xl text-black font-bold">Priya-16 Weeks</h3>
+          <p class="text-gray-600 mt-2">
+           Transformed with strength training & calorie-balanced diet. 
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <img src="https://i.ibb.co/CspFgxnm/pic2.jpg" class="w-full h-81 object-cover">
+        <div class="p-5">
+          <h3 class="text-xl text-black font-bold">Oliver-12 weeks </h3>
+          <p class="text-gray-600 mt-2">
+           Lost 14 kg & built lean muscle through our workout and diet plan. 
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <img src="https://i.ibb.co/qFLDMhXn/pic3.jpg" class="w-full h-81 object-cover">
+        <div class="p-5">
+          <h3 class="text-xl text-black font-bold">Aadhya - 10 Weeks</h3>
+          <p class="text-gray-600 mt-2">
+            Improved posture, strength & endurance with a guided plan.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section> <br>
+
+  <!-- ========================= -->
+  <!-- Membership Plans -->
+  <!-- ========================= -->
+  <section>
+    <div class="w-full flex items-center flex-wrap justify-around bg-black text-white">
+      <!-- inage_div -->
+     <div class="w-[350px]">
+       <img src="https://i.ibb.co/N2gGnM6s/bg.png" alt="">
+     </div>
+     <!-- card_and_text_div -->
+     <div class="w-[70%] flex justify-center items-center mt-15 flex-col">
+       <div class="text-center">
+         <h1 class="text-amber-300 text-3xl font-bold uppercase sm:text-5xl ">membership <br>plans</h1>
+       </div>
+       <!-- doggle -->
+        <div class="my-10 flex items-center justify-center gap-4">
+         <p class="text-xl font-semibold">Month</p>
+         <label class="relative inline-flex items-center cursor-pointer">
+           <input type="checkbox" class="sr-only peer" onclick="chnage()">
+           <div class="w-14 h-7 bg-gray-500 rounded-full peer-checked:bg-amber-400 duration-300"></div>
+           <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-7"></div>
+         </label>
+         <p class="text-xl font-semibold">Year</p>
+        </div>
+       <!-- silver_card1 -->
+       <div class=" w-full flex items-center justify-around flex-wrap m-1  ">
+         <div class="w-[250px] text-center border border-[#FCD34D] rounded-3xl hover:bg-white/20 hover:scale-105 transition-transform duration-300">
+           <h1 class="text-amber-300 text-5xl font-bold uppercase m-5">silver</h1>
+           <h2  class="text-5xl m-5" id="silver_old">₹1000</h2>
+           <h2  class="text-5xl m-5 hidden" id="silver_new">₹8,000</h2>
+           <h2  class="text-3xl" id="silver_month">/Month</h2>
+           <h2  class="text-3xl hidden" id="silver_years">/Year</h2>
+           <div class="m-5">
+             <button class="text-3xl uppercase font-bold p-4 bg-amber-300 text-black rounded-2xl"> save 20%</button>
+           </div>
+          </div>
+         
+         <!-- secnd_card -->
+          <div class="w-[250px] text-center border border-[#FCD34D] m-1 rounded-2xl hover:bg-white/20 hover:scale-105 transition-transform duration-300">
+           <h1 class="text-amber-300 text-5xl font-bold uppercase m-3">gold</h1>
+           <h3 class="capitalize">(recommended)</h3>
+           <h2  class="text-5xl m-2" id="gold_old_value">₹12,00</h2>
+           <h2  class="text-5xl m-2 hidden"id="gold_new_value">₹11,520</h2>
+           <h2  class="text-3xl" id="gold_month">/Month</h2>
+           <h2  class="text-3xl hidden " id="gold_years">/Year</h2>
+           <div class="m-5">
+             <button class="text-3xl uppercase font-bold p-4 bg-amber-300 text-black rounded-2xl "> save 20%</button>
+           </div>
+         </div>
+         <!-- third_card -->
+          <div class="w-[250px] text-center border border-[#FCD34D] m-1 rounded-2xl hover:bg-white/20 hover:scale-105 transition-transform duration-300">
+             <h1 class="text-amber-300 text-4xl font-bold uppercase m-6">platinum</h1>
+             <h2  class="text-5xl m-5" id="old_value">₹15,00</h2>
+             <h2  class="text-5xl m-5 hidden" id="new_value">₹14,400</h2>
+             <h2  class="text-3xl" id="platinum_month">/Month</h2>
+             <h2  class="text-3xl hidden" id="platinum_years">/Year</h2>
+             <div class="m-5">
+               <button class="text-3xl uppercase font-bold p-4 bg-amber-300 text-black rounded-2xl"> save 20%</button>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- Contact + Map -->
+  <!-- ========================= -->
+   <section class="max-w-7xl mx-auto  text-slate-100 p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- LEFT SIDE -->
+    <div class="bg-[#111a2f] p-8 rounded-2xl shadow-xl space-y-6">
+      <div>
+        <h2 class="text-3xl font-bold">Contact Us</h2>
+        <p class="text-slate-300 mt-2">Have questions about membership or training? We're here to help.</p>
+      </div>
+
+      <!-- CONTACT BUTTONS -->
+      <div class="flex flex-wrap gap-3">
+        <a href="tel:+919876543210"
+           class="px-4 py-2 bg-emerald-500 font-semibold text-black rounded-lg hover:scale-105 transition-all"><i class="fa-solid fa-phone"></i>
+           Call
+        </a>
+        <a href="mailto:gym@example.com"
+           class="px-4 py-2 bg-amber-400 font-semibold text-black rounded-lg hover:scale-105 transition-all"><i class="fa-solid fa-envelope"></i>
+           Email
+        </a>
+        <a href="https://wa.me/919876543210?text=Hello"
+           target="_blank"
+           class="px-4 py-2 bg-sky-400 font-semibold text-black rounded-lg hover:scale-105 transition-all"><i class="fa-brands fa-whatsapp"></i>
+           WhatsApp
+        </a>
+      </div>
+
+      <!-- SUCCESS MESSAGE -->
+      <div id="successMsg" class="hidden bg-blue-200 text-black p-3 rounded-lg font-semibold fade-in"><i class="fa-solid fa-check"></i>
+       Your message has been sent!
+      </div>
+
+      <!-- FORM -->
+      <form id="contactForm" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1">Your Name</label>
+            <input name="name" required
+              class="w-full p-3 bg-[#1a2440] rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter full name" />
+          </div>
+          <div>
+            <label class="block mb-1">Email</label>
+            <input type="email" name="email" required
+              class="w-full p-3 bg-[#1a2440] rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter email" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1">Phone Number</label>
+            <input name="phone" required
+              class="w-full p-3 bg-[#1a2440] rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Ener Phone" />
+          </div>
+          <div>
+            <label class="block mb-1">Membership</label>
+            <select name="service"
+              class="w-full p-3 bg-[#1a2440] rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+               <option value="" disabled selected>Choose Membership</option>
+              <option>Silver</option>
+              <option>Gold</option>
+              <option>Platinum</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block mb-1">Message (Optional)</label>
+          <textarea name="message" rows="4"
+            class="w-full p-3 bg-[#1a2440] rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="Write your message..."></textarea>
+        </div>
+        <button
+          class="px-6 py-3 bg-indigo-500 text-white rounded-lg font-semibold hover:scale-105 transition-all">
+          Send Message
+        </button>
+      </form>
+    </div>
+
+    <!-- RIGHT SIDE DARK MAP -->
+    <div class="rounded-2xl overflow-hidden shadow-xl h-full min-h-[480px]">
+      <iframe
+        class="w-full h-full"
+        style="border:0; filter: brightness(100%) invert(90%) hue-rotate(180deg) contrast(120%);"
+        loading="lazy"
+        allowfullscreen
+        src="https://www.google.com/maps?q=MBR%20Gym&output=embed">
+      </iframe>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- Footer -->
+  <!-- ========================= -->
+  <footer class="px-6  text-gray-200 py-10 mt-10">
+    <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-10 shadow-xl shadow-black/40">
+      <!-- HEADINGS -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 font-semibold text-xl mb-6 text-yellow-400">
+        <p>GET IN TOUCH</p>
+        <p>FOLLOW US</p>
+        <p>OPEN HOURS</p>
+        <p>NEWSLETTER</p>
+      </div>
+  
+      <!-- CONTENT -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+  
+        <!-- GET IN TOUCH -->
+        <div class="space-y-3">
+          <p class="flex items-center">
+            <i class="fa-solid fa-location-dot text-yellow-500 mr-2"></i>
+            123 Street, New Delhi, India
+          </p>
+          <p class="flex items-center">
+            <i class="fa-solid fa-phone text-yellow-500 mr-2"></i>
+            +012 345 67890
+          </p>
+          <p class="flex items-center">
+            <i class="fa-solid fa-envelope text-yellow-500 mr-2"></i>
+            info@example.com
+          </p>
+        </div>
+  
+        <!-- FOLLOW US -->
+        <div>
+          <p class="mb-4 opacity-80">Amet elitr vero magna sed ipsum sit kasd sea elitr lorem rebum</p>
+          <div class="flex gap-3">
+            <a href="https://x.com" target="_blank"
+              class="p-3 border border-white/20 rounded-lg backdrop-blur-lg bg-white/10 hover:bg-white hover:text-yellow-600 transition-all duration-300">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+  
+            <a href="https://facebook.com" target="_blank"
+              class="p-3 border border-white/20 rounded-lg backdrop-blur-lg bg-white/10 hover:bg-white hover:text-yellow-600 transition-all duration-300">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+  
+            <a href="https://linkedin.com" target="_blank"
+              class="p-3 border border-white/20 rounded-lg backdrop-blur-lg bg-white/10 hover:bg-white hover:text-yellow-600 transition-all duration-300">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+  
+            <a href="https://instagram.com" target="_blank"
+              class="p-3 border border-white/20 rounded-lg backdrop-blur-lg bg-white/10 hover:bg-white hover:text-yellow-600 transition-all duration-300">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+  
+        <!-- OPEN HOURS -->
+        <div class="space-y-1 opacity-90">
+          <p class="font-semibold text-yellow-400">MONDAY - FRIDAY</p>
+          <p>8.00 AM - 8.00 PM</p>
+          <p class="font-semibold text-yellow-400 mt-3">SATURDAY - SUNDAY</p>
+          <p>2.00 PM - 8.00 PM</p>
+        </div>
+  
+        <!-- NEWSLETTER -->
+        <div>
+          <p class="mb-4 opacity-80">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Molestiae nisi rerum labore voluptatibus necessitatibus voluptate?</p>
+  
+          <form id="newsletterForm" class="flex gap-2">
+            <input type="email" required placeholder="Your Email"
+              class="px-3 py-2 bg-white/10 border border-white/20 rounded backdrop-blur-xl text-white placeholder-gray-300 focus:outline-none">
+            
+            <button type="submit"
+              class="px-4 py-2 bg-yellow-500 text-black font-semibold rounded hover:bg-yellow-400 shadow-lg shadow-yellow-500/30">
+              Sign Up
+            </button>
+          </form>
+  
+          <p id="successMsg" class="text-green-400 mt-3 hidden">✔ Successfully Subscribed!</p>
+        </div>
+  
+      </div>
+    </div>
+  </footer>
+  <!-- JOIN NOW POPUP FORM -->
+  <div id="joinPopup" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-gray-900 p-8 rounded-2xl w-[90%] max-w-md shadow-lg relative">
+      <button onclick="closeJoinForm()" class="absolute top-2 right-4 text-white text-3xl">&times;</button>
+      <h2 class="text-3xl font-bold mb-6 text-center text-blue-400">Join Now</h2>
+      <input id="joinName" type="text" placeholder="Full Name" class="w-full mb-3 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white">
+      <input id="joinAge" type="number" placeholder="Age" class="w-full mb-3 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white">
+      <input id="joinPhone" type="number" placeholder="Phone Number" class="w-full mb-3 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white">
+      <input id="joinEmail" type="email" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white">
+  
+      <button onclick="submitJoinForm()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold">
+       Submit
+      </button>
+    </div>
+  </div>
+
+
+  
+  <!-- ========================= -->
+  <!-- CHATBOT -->
+  <!-- ========================= -->
+  <button id="chatToggle" class="fixed bottom-6 right-6 bg-blue-600 text-white px-5 py-3 rounded-full shadow-xl hover:bg-blue-700 transition">💬 Chat Assistant</button>
+  <div id="chatWindow" class="glass fixed bottom-24 right-6 w-80 md:w-96 opacity-0 pointer-events-none transform translate-y-5">
+    <div class="bg-blue-600 text-white px-4 py-3 rounded-t-xl flex justify-between">
+      <span class="font-semibold">Chat Assistant</span>
+      <button id="chatClose" class="text-white text-xl">X</button>
+    </div>
+    <div id="chatMessages" class="p-4 h-80 overflow-y-auto space-y-3"></div>
+    <div class="p-3 border-t flex gap-2">
+      <input id="chatInput" placeholder="Type here..." class="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring bg-white/20 text-black placeholder-gray-700 glass">
+
+      <button id="chatSend" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Send</button>
+    </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- JAVASCRIPT -->
+  <!-- ========================= -->
+  <script>
+    // MOBILE MENU TOGGLE
+    const menuButton = document.querySelector('nav svg');
+    const mobileMenu = document.createElement('div');
+    mobileMenu.className = 'absolute top-full left-0 w-full bg-black/80 backdrop-blur-md flex flex-col items-center md:hidden space-y-4 py-4 hidden z-40';
+    mobileMenu.innerHTML = `
+      <a href="#" class="hover:text-red-500 transition">Home</a>
+      <a href="#" class="hover:text-red-500 transition">Programs</a>
+      <a href="#" class="hover:text-red-500 transition">Trainers</a>
+      <a href="#" class="hover:text-red-500 transition">Contact</a>
+      <button class="px-6 py-2 bg-blue-600 rounded-xl hover:bg-blue-700 transition shadow-lg hover:shadow-blue-600/50">Join Now</button>
+    `;
+    document.querySelector('nav').appendChild(mobileMenu);
+    
+    menuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // ---------- HERO VIDEO ----------
+    const videoID = "__jqegn6rBk"; 
+    const startTime = 60; 
+
+    function openVideo() {
+      const modal = document.getElementById("videoModal");
+      const iframe = document.getElementById("ytVideo");
+      modal.classList.remove("hidden");
+      iframe.src = `https://www.youtube.com/embed/${videoID}?autoplay=1&start=${startTime}`;
+    }
+
+    function closeVideo() {
+      const modal = document.getElementById("videoModal");
+      const iframe = document.getElementById("ytVideo");
+      modal.classList.add("hidden");
+      iframe.src = ""; 
+    }
+
+    // ---------- BMI CALCULATOR ----------
+    const calculateBtn = document.getElementById('calculateBtn');
+    const heightInput = document.getElementById('height');
+    const weightInput = document.getElementById('weight');
+    const ageInput = document.getElementById('age');
+    const activitySelect = document.getElementById('activity');
+    const goalSelect = document.getElementById('goal');
+    const bmiValue = document.getElementById('bmiValue');
+    const bmiCategory = document.getElementById('bmiCategory');
+    const goalStatement = document.getElementById('goalStatement');
+
+    function calculateResults() {
+      const height = parseFloat(heightInput.value);
+      const weight = parseFloat(weightInput.value);
+      const age = parseInt(ageInput.value);
+      const activity = parseFloat(activitySelect.value);
+      const goal = goalSelect.value;
+
+      const heightM = height / 100;
+      const bmi = weight / (heightM * heightM);
+      let category = "";
+      if (!isNaN(bmi)) {
+        if (bmi < 18.5) category = "Underweight";
+        else if (bmi < 25) category = "Normal";
+        else if (bmi < 30) category = "Overweight";
+        else category = "Obese";
+      }
+      bmiValue.textContent = isNaN(bmi) ? "--" : bmi.toFixed(1);
+      bmiCategory.textContent = isNaN(bmi) ? "--" : category;
+
+      let calories = "--";
+      if (!isNaN(weight) && !isNaN(height) && !isNaN(age) && !isNaN(activity)) {
+        let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+        let tdee = bmr * activity;
+        calories = goal === "bulk" ? Math.round(tdee * 1.15) : goal === "lose" ? Math.round(tdee * 0.85) : Math.round(tdee);
+      }
+      goalStatement.innerHTML = calories === "--" ? "You need -- calories." : `You need <span>${calories}</span> calories to <span class="font-bold">${goal}</span>.`;
+    }
+    calculateBtn.addEventListener("click", calculateResults);
+
+    document.getElementById("dietBtn").addEventListener("click", () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const goal = prompt("Your goal? (weightloss / weightgain / fitness)") || "fitness";
+      let title = "", plan = [];
+      if (goal === "weightloss") {
+        title = "Weight Loss Diet Plan";
+        plan = ["Morning: Warm water + lemon","Breakfast: Oats + fruits","Lunch: 2 chapati + sabzi + salad","Evening: Green tea","Dinner: Soup / light khichdi","Avoid sugar, bakery items, fried food"];
+      } else if (goal === "weightgain") {
+        title = "Weight Gain Diet Plan";
+        plan = ["Morning: Banana shake","Breakfast: Paneer sandwich / eggs","Lunch: Rice + dal + paneer","Evening: Peanut butter sandwich","Dinner: Roti + paneer + curd","Extra: Dry fruits, ghee, milk products"];
+      } else {
+        title = "General Fitness Diet Plan";
+        plan = ["Balanced meals","3-4 liters water daily","Seasonal fruits every day","High protein, low sugar","30–45 mins exercise daily"];
+      }
+
+      pdf.setFillColor(111, 90, 255); pdf.rect(0, 0, 210, 30, "F");
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(18); pdf.setTextColor(255, 255, 255);
+      pdf.text(title, 10, 20);
+      pdf.setFillColor(245,245,245); pdf.rect(0, 30, 210, 260, "F");
+      pdf.setTextColor(0,0,0); pdf.setFontSize(12);
+      plan.forEach((line, i) => pdf.text(`${i+1}. ${line}`, 10, 45 + i*10));
+      pdf.save(`${title}.pdf`);
+    });
+
+    // ---------- CHATBOT ----------
+    const chatToggle = document.getElementById("chatToggle");
+    const chatWindow = document.getElementById("chatWindow");
+    const chatClose = document.getElementById("chatClose");
+    const chatMessages = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const chatSend = document.getElementById("chatSend");
+
+    function openChat() {
+      chatWindow.style.opacity = "1";
+      chatWindow.style.transform = "translateY(0)";
+      chatWindow.style.pointerEvents = "auto";
+      if (!chatWindow.dataset.started) {
+        chatWindow.dataset.started = "true";
+        botMessage("👋 Hello! What is your fitness goal?<br>🔥 Weight Loss or 💪 Muscle Gain?");
+      }
+    }
+
+    function closeChat() {
+      chatWindow.style.opacity = "0";
+      chatWindow.style.transform = "translateY(10px)";
+      chatWindow.style.pointerEvents = "none";
+    }
+
+    chatToggle.onclick = openChat;
+    chatClose.onclick = closeChat;
+
+    function userMessage(text) {
+      const div = document.createElement("div");
+      div.className = "text-right";
+      div.innerHTML = `<p class="inline-block bg-blue-600 text-black px-3 py-2 rounded-lg">${text}</p>`;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function botMessage(text) {
+      const div = document.createElement("div");
+      div.className = "text-left";
+      div.innerHTML = `<p class="inline-block bg-gray-200 text-black px-3 py-2 rounded-lg">${text}</p>`;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function processInput(text) {
+      const msg = text.toLowerCase();
+      if (msg.includes("weight") || msg.includes("loss")) botMessage("🔥 <b>Weight Loss Plan</b><br>• 20 min cardio<br>• High protein<br>• Avoid junk<br>• 3-day strength<br><br>Need a weekly plan?");
+      else if (msg.includes("muscle") || msg.includes("gain")) botMessage("💪 <b>Muscle Gain Plan</b><br>• 5-day strength<br>• High calorie + protein<br>• Progressive overload<br>• Sleep 8 hrs");
+      else if (msg.includes("beginner") || msg.includes("start")) botMessage("🚀 <b>Beginner Routine</b><br>• Warm-up 10 min<br>• Full body 3 days/week<br>• Light weights first");
+      else if (msg.includes("daily workout") || msg.includes("daily plan")) botMessage("🗓 <b>Daily Workout</b><br>• Warm-up<br>• 25 min strength<br>• Stretch 10 min");
+      else if (msg.includes("diet") || msg.includes("chart")) botMessage("🥗 <b>Simple Diet</b><br>• Breakfast: Oats<br>• Lunch: Dal rice / chicken<br>• Snack: Nuts<br>• Dinner: Light roti + sabzi");
+      else if (msg.includes("pre workout") || msg.includes("before workout")) botMessage("⚡ Pre-Workout:<br>• Banana<br>• Oats<br>• Peanut butter toast<br>• Black coffee");
+      else if (msg.includes("post workout") || msg.includes("after workout")) botMessage("💥 Post-Workout:<br>• Eggs / Paneer<br>• Dal rice<br>• Protein shake");
+      else if (msg.includes("belly") || msg.includes("fat")) botMessage("🔥 Belly fat reduces with overall fat loss.<br>• Daily cardio<br>• Protein diet<br>• Avoid sugar drinks");
+      else if (msg.includes("motivate") || msg.includes("lazy")) botMessage("✨ Motivation Tips:<br>• Set small goals<br>• Track progress<br>• Listen to gym music");
+      else if (msg.includes("pain") || msg.includes("sore")) botMessage("🧘 Muscle soreness is normal.<br>• Drink more water<br>• Stretch<br>• Sleep well");
+      else if (msg.includes("tips")) botMessage("📌 Gym Tips:<br>• Warm-up<br>• Correct form<br>• Don't lift too heavy");
+      else if (msg.includes("mistake")) botMessage("⚠️ Mistakes:<br>• No warm-up<br>• Heavy weight<br>• No rest");
+      else if (msg.includes("home") || msg.includes("no equipment")) botMessage("🏠 Home Workout:<br>• Jumping jacks<br>• Squats<br>• Pushups<br>• Mountain climbers");
+      else if (msg.includes("weekly") || msg.includes("routine")) botMessage("📅 Weekly Plan:<br>Mon: Chest<br>Tue: Back<br>Wed: Legs<br>Thu: Shoulders<br>Fri: Full body<br>Sat: Cardio<br>Sun: Rest");
+      else if (msg.includes("water") || msg.includes("drink")) botMessage("💧 2-3 liters per day is ideal.");
+      else if (msg.includes("sleep")) botMessage("😴 Sleep 7-8 hours for best recovery.");
+      else botMessage("💬 I can help with: Weight Loss, Muscle Gain, Diet, Gym Tips, Plans & more!");
+    }
+
+    function sendMsg() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      userMessage(text);
+      chatInput.value = "";
+      processInput(text);
+    }
+
+    // Membership Plans Toggle
+    function chnage(){
+    let toggle = document.querySelector("input[type='checkbox']");
+  
+    let old_value = document.getElementById('old_value');
+    let new_value = document.getElementById('new_value');
+  
+    let gold_old_value = document.getElementById('gold_old_value');
+    let gold_new_value = document.getElementById('gold_new_value');
+  
+    if(toggle.checked){
+      silver_month.classList.add('hidden')
+      silver_years.classList.remove('hidden')
+      silver_old.classList.add('hidden')
+      silver_new.classList.remove('hidden')
+  
+      old_value.classList.add('hidden');
+      new_value.classList.remove('hidden');
+      platinum_month.classList.add('hidden')
+      platinum_years.classList.remove('hidden')
+  
+      gold_month.classList.add('hidden')
+      gold_years.classList.remove('hidden')
+      gold_old_value.classList.add('hidden');
+      gold_new_value.classList.remove('hidden');
+    } else {
+      silver_month.classList.remove('hidden')
+      silver_years.classList.add('hidden')
+      silver_old.classList.remove('hidden')
+      silver_new.classList.add('hidden')
+  
+      old_value.classList.remove('hidden');
+      new_value.classList.add('hidden');
+       platinum_month.classList.remove('hidden')
+      platinum_years.classList.add('hidden')
+      
+      gold_month.classList.remove('hidden')
+      gold_years.classList.add('hidden')
+      gold_old_value.classList.remove('hidden');
+      gold_new_value.classList.add('hidden');
+    }
+  }
+  // Contact + Map
+   const form = document.getElementById("contactForm");
+    const msg = document.getElementById("successMsg");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      msg.classList.remove("hidden");
+      form.reset();
+    });
+    // Footer
+    document.getElementById("newsletterForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      document.getElementById("successMsg").classList.remove("hidden");
+    });
+    // Join Now Form OPEN POPUP
+    function openJoinForm() {
+      document.getElementById("joinPopup").classList.remove("hidden");
+    }
+  
+    // CLOSE POPUP
+    function closeJoinForm() {
+      document.getElementById("joinPopup").classList.add("hidden");
+    }
+  
+    // SUBMIT FORM
+    function submitJoinForm() {
+      const name = document.getElementById("joinName").value.trim();
+      const age = document.getElementById("joinAge").value.trim();
+      const phone = document.getElementById("joinPhone").value.trim();
+      const email = document.getElementById("joinEmail").value.trim();
+  
+      if (!name || !age || !phone || !email) {
+        alert("Please fill all fields!");
+        return;
+      }
+  
+      alert("Form Submitted Successfully!");
+      closeJoinForm();
+    }
+  
+    // MAKE ALL JOIN NOW BUTTONS WORK
+    document.querySelectorAll("button").forEach(btn => {
+      if (btn.textContent.trim() === "Join Now") {
+        btn.addEventListener("click", openJoinForm);
+      }
+    });
+
+    chatSend.onclick = sendMsg;
+    chatInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMsg(); });
+  </script>
+</body>
+</html>
